@@ -23,6 +23,8 @@ jobs:
           repository: kaylenmistry/dali-framework
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           path: dali-framework
+      - name: Create Package.swift file
+        run: touch Package.swift
       - name: Build device archive
         working-directory: ./dali-framework
         run: |
