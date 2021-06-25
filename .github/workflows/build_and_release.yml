@@ -17,7 +17,6 @@ jobs:
         with:
           repository: kaylenmistry/dali-framework
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          path: dali-framework
       - name: Install the Apple certificate and provisioning profile
         uses: apple-actions/import-codesign-certs@v1
         with:
@@ -26,7 +25,6 @@ jobs:
       - name: Create Package.swift file
         run: touch Package.swift
       - name: Build device archive
-        working-directory: ./dali-framework
         run: |
           xcodebuild archive \
             -scheme Dali \
@@ -35,7 +33,6 @@ jobs:
             -archivePath 'Dali-iphoneos.xcarchive' \
             SKIP_INSTALL=NO
       - name: Build simulator archive 
-        working-directory: ./dali-framework
         run: |
           xcodebuild archive \
             -scheme Dali \
@@ -44,18 +41,15 @@ jobs:
             -archivePath 'Dali-iphonesimulator.xcarchive' \
             SKIP_INSTALL=NO
       - name: Create XCFramework
-        working-directory: ./dali-framework
         run: |
           xcodebuild -create-xcframework \
             -framework 'Dali-iphoneos.xcarchive/Products/Library/Frameworks/Dali.framework' \
             -framework 'Dali-iphonesimulator.xcarchive/Products/Library/Frameworks/Dali.framework' \
             -output 'Dali.xcframework'
       - name: Compress XCFramework folder
-        working-directory: ./dali-framework
         run: zip -r Dali.xcframework.zip Dali.xcframework
       - name: Compute checksum of XCFramework artifact
         id: compute-checksum
-        working-directory: ./dali-framework
         run: |
           CHECKSUM=`swift package compute-checksum Dali.xcframework.zip`
           echo "::set-output name=checksum::$CHECKSUM"
@@ -90,13 +84,11 @@ jobs:
         with:
           repository: kaylenmistry/dali
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          path: dali
       - name: Setup git config
         run: |
           git config user.name "kaylenmistry"
           git config user.email "kaylenmistry@gmail.com"
       - name: Open Release PR on dali repo
-        working-directory: ./dali
         run: |
           RELEASE_VERSION=v0.0.1
           CHECKSUM=${{ needs.build.outputs.checksum }}
