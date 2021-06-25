@@ -81,7 +81,7 @@ jobs:
         working-directory: ./dali
         run: |
           RELEASE_VERSION=v0.0.1
-          BRANCH_NAME= release/test/$RELEASE_VERSION
+          BRANCH_NAME=release/test/$RELEASE_VERSION
           git checkout -b $BRANCH_NAME
           sed -Ei '' 's/(url: "[a-zA-Z0-9.:\/-]+)(v[0-9]+.[0-9]+.[0-9]+)([a-zA-Z0-9.\/-]+")/\1'"$RELEASE_VERSION"'\3/' Package.swift
           sed -Ei '' 's/(checksum: )("[a-f0-9]+")/\1"'"$ARTIFACT_CHECKSUM"'"/' Package.swift
