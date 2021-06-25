@@ -2,9 +2,9 @@
 ---
 name: Release XCFramework
 on:
-  push:
-    tags:
-      - 'v*.*.*'
+  push
+  #   tags:
+  #     - 'v*.*.*'
 jobs:
   release:
     name: Build, publish and release XCFramework
@@ -65,3 +65,17 @@ jobs:
             dali-framework/artifact-checksum.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout dali repo
+        uses: actions/checkout@v2
+        with:
+          repository: kaylenmistry/dali-framework
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          path: dali
+      - name: Setup git config
+        run: |
+          git config user.name "kaylenmistry"
+          git config user.email "kaylenmistry@gmail.com"
+      - name: Open Release PR on dali repo
+        working-directory: ./dali
+        run: |
+          git status
