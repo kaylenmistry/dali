@@ -56,7 +56,7 @@ jobs:
       - name: Compute checksum of XCFramework artifact
         working-directory: ./dali-framework
         run: | 
-          ARTIFACT_CHECKSUM=`swift package compute-checksum Dali.xcframework.zip`
+          export ARTIFACT_CHECKSUM=`swift package compute-checksum Dali.xcframework.zip`
           echo $ARTIFACT_CHECKSUM > artifact-checksum.txt
       - name: Release XCFramework
         uses: softprops/action-gh-release@v1
