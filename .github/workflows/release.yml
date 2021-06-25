@@ -78,4 +78,4 @@ jobs:
       - name: Open Release PR on dali repo
         working-directory: ./dali
         run: |
-          git status
+          git remote show origin
