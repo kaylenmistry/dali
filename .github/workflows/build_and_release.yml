@@ -6,23 +6,23 @@ on:
   #   tags:
   #     - 'v*.*.*'
 jobs:
-  release:
-    name: Build, publish and release XCFramework
+  build:
+    name: Build XCFramework
     runs-on: macos-latest
+    outputs:
+      checksum: ${{ steps.compute-checksum.outputs.checksum }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Install the Apple certificate and provisioning profile
-        uses: apple-actions/import-codesign-certs@v1
-        with:
-          p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
-          p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
       - name: Checkout dali-framework repo
         uses: actions/checkout@v2
         with:
           repository: kaylenmistry/dali-framework
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           path: dali-framework
+      - name: Install the Apple certificate and provisioning profile
+        uses: apple-actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
+          p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
       - name: Create Package.swift file
         run: touch Package.swift
       - name: Build device archive
@@ -54,19 +54,37 @@ jobs:
         working-directory: ./dali-framework
         run: zip -r Dali.xcframework.zip Dali.xcframework
       - name: Compute checksum of XCFramework artifact
+        id: compute-checksum
         working-directory: ./dali-framework
-        run: | 
-          export ARTIFACT_CHECKSUM=`swift package compute-checksum Dali.xcframework.zip`
-          echo $ARTIFACT_CHECKSUM > artifact-checksum.txt
+        run: |
+          CHECKSUM=`swift package compute-checksum Dali.xcframework.zip`
+          echo "::set-output name=checksum::$CHECKSUM"
+      - uses: actions/upload-artifact@v2
+        with:
+          name: dali-framework
+          path: Dali.xcframework.zip
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: dali-framework
       - name: Release XCFramework
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            dali-framework/Dali.xcframework.zip
-            dali-framework/artifact-checksum.txt
+          files: dali-framework
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  distribute:
+    name: Open release PR in dali repo
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout dali repo
         uses: actions/checkout@v2
         with:
@@ -81,10 +99,11 @@ jobs:
         working-directory: ./dali
         run: |
           RELEASE_VERSION=v0.0.1
+          CHECKSUM=${{ needs.build.outputs.checksum }}
           BRANCH_NAME=release/test/$RELEASE_VERSION
           git checkout -b $BRANCH_NAME
           sed -Ei '' 's/(url: "[a-zA-Z0-9.:\/-]+)(v[0-9]+.[0-9]+.[0-9]+)([a-zA-Z0-9.\/-]+")/\1'"$RELEASE_VERSION"'\3/' Package.swift
-          sed -Ei '' 's/(checksum: )("[a-f0-9]+")/\1"'"$ARTIFACT_CHECKSUM"'"/' Package.swift
+          sed -Ei '' 's/(checksum: )("[a-f0-9]+")/\1"'"$CHECKSUM"'"/' Package.swift
           git add .
           git commit -m "Release $RELEASE_VERSION"
           git push --set-upstream origin $BRANCH_NAME
