@@ -1,4 +1,4 @@
-# .github/workflows/release.yml
+# .github/workflows/build_and_release.yml
 ---
 name: Release XCFramework
 on:
@@ -71,7 +71,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: dali-framework
+          files: Dali.xcframework.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   distribute:
