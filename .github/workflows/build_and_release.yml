@@ -1,4 +1,4 @@
-# .github/workflows/release.yml
+# .github/workflows/build_and_release.yml
 ---
 name: Release XCFramework
 on:
