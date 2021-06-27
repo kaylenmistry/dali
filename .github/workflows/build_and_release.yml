@@ -24,7 +24,7 @@ jobs:
       - name: Checkout tagged commit
         run: |
           RELEASE_TAG=${GITHUB_REF#refs/*/}
-          git checkout @RELEASE_TAG
+          git checkout $RELEASE_TAG
       - name: Install the Apple certificate and provisioning profile
         uses: apple-actions/import-codesign-certs@v1
         with:
