@@ -17,14 +17,7 @@ jobs:
         with:
           repository: kaylenmistry/dali-framework
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      - name: Setup git config
-        run: |
-          git config user.name "kaylenmistry"
-          git config user.email "kaylenmistry@gmail.com"
-      - name: Checkout tagged commit
-        run: |
-          RELEASE_TAG=${GITHUB_REF#refs/*/}
-          git checkout $RELEASE_TAG
+          ref: ${GITHUB_REF#refs/*/}
       - name: Install the Apple certificate and provisioning profile
         uses: apple-actions/import-codesign-certs@v1
         with:
