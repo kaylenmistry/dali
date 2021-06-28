@@ -4,7 +4,7 @@ name: Release XCFramework
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 jobs:
   build:
     name: Build XCFramework
@@ -12,6 +12,7 @@ jobs:
     outputs:
       checksum: ${{ steps.compute-checksum.outputs.checksum }}
     steps:
+      - run: echo ${{ github.event.release.tag_name }}
       - name: Checkout dali-framework repo
         uses: actions/checkout@v2
         with:
@@ -33,7 +34,7 @@ jobs:
             -sdk iphoneos \
             -archivePath 'Dali-iphoneos.xcarchive' \
             SKIP_INSTALL=NO
-      - name: Build simulator archive 
+      - name: Build simulator archive
         run: |
           xcodebuild archive \
             -scheme Dali \
