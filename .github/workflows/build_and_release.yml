@@ -14,8 +14,10 @@ jobs:
     steps:
       - run: |
           echo "HERE"
-          echo ${{ github.event.release.tag_name }}
+          echo ${GITHUB_REF#refs/*/}
           echo "YOU GO"
+      # - run: |
+      #     echo ${{ steps.tag.outputs.result}}
       - name: Checkout dali-framework repo
         uses: actions/checkout@v2
         with:
