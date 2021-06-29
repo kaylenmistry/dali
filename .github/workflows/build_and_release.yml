@@ -12,6 +12,10 @@ jobs:
     outputs:
       checksum: ${{ steps.compute-checksum.outputs.checksum }}
     steps:
+      - run: |
+          echo "HERE"
+          echo ${{ github.event.release.tag_name }}
+          echo "YOU GO"
       - name: Checkout dali-framework repo
         uses: actions/checkout@v2
         with:
