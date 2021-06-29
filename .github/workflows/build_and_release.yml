@@ -13,8 +13,8 @@ jobs:
       checksum: ${{ steps.compute-checksum.outputs.checksum }}
     steps:
       - name: Store release version tag
-      - id: get-version
-      - run: echo "::set-output name=version::${GITHUB_REF#refs/*/}"
+        id: get-version
+        run: echo "::set-output name=version::${GITHUB_REF#refs/*/}"
       - run: echo ${{ steps.get-version.outputs.version }}
       - name: Checkout dali-framework repo
         uses: actions/checkout@v2
