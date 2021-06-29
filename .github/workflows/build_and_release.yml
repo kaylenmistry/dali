@@ -12,18 +12,16 @@ jobs:
     outputs:
       checksum: ${{ steps.compute-checksum.outputs.checksum }}
     steps:
-      - run: |
-          echo "HERE"
-          echo ${GITHUB_REF#refs/*/}
-          echo "YOU GO"
-      # - run: |
-      #     echo ${{ steps.tag.outputs.result}}
+      - name: Store release version tag
+      - id: get-version
+      - run: echo "::set-output name=version::${GITHUB_REF#refs/*/}"
+      - run: echo ${{ steps.get-version.outputs.version }}
       - name: Checkout dali-framework repo
         uses: actions/checkout@v2
         with:
           repository: kaylenmistry/dali-framework
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ steps.get-version.outputs.version }}
       - name: Install the Apple certificate and provisioning profile
         uses: apple-actions/import-codesign-certs@v1
         with:
