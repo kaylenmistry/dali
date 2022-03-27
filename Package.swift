@@ -14,7 +14,7 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "Dali",
-            url: "https://github.com/kaylenmistry/dali/releases/download/v0.0.7/Dali.xcframework.zip", checksum: ""
+            url: "https://github.com/kaylenmistry/dali/releases/download/v0.0.8/Dali.xcframework.zip", checksum: ""
         )
     ]
 )
