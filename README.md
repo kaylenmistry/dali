@@ -1,1 +1,3 @@
-# Dali Framework Public
+# Dali
+
+Dali Package for distributing Dali AR framework

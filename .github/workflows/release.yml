@@ -52,11 +52,6 @@ jobs:
             -output 'Dali.xcframework'
       - name: Compress XCFramework folder
         run: zip -r Dali.xcframework.zip Dali.xcframework
-      - name: Compute checksum of XCFramework artifact
-        id: compute-checksum
-        run: |
-          CHECKSUM=`swift package compute-checksum Dali.xcframework.zip`
-          echo "::set-output name=checksum::$CHECKSUM"
       - uses: actions/upload-artifact@v2
         with:
           name: dali-framework
@@ -78,28 +73,3 @@ jobs:
           files: Dali.xcframework.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  distribute:
-    name: Open release PR in dali repo
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout dali repo
-        uses: actions/checkout@v2
-        with:
-          repository: kaylenmistry/dali
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      - name: Setup git config
-        run: |
-          git config user.name "kaylenmistry"
-          git config user.email "kaylenmistry@gmail.com"
-      - name: Open Release PR on dali repo
-        run: |
-          RELEASE_VERSION=${GITHUB_REF#refs/*/}
-          CHECKSUM=${{ needs.build.outputs.checksum }}
-          BRANCH_NAME=release/$RELEASE_VERSION
-          git checkout -b $BRANCH_NAME
-          sed -Ei 's/(url: "[a-zA-Z0-9.:\/-]+)(v[0-9]+.[0-9]+.[0-9]+)([a-zA-Z0-9.\/-]+")/\1'"$RELEASE_VERSION"'\3/' Package.swift
-          sed -Ei 's/(checksum: )("[a-f0-9]+")/\1"'"$CHECKSUM"'"/' Package.swift
-          git add .
-          git commit -m "Release $RELEASE_VERSION"
-          git push --set-upstream origin $BRANCH_NAME
